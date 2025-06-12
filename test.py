@@ -14,9 +14,42 @@ fastf1.Cache.enable_cache(CACHE_DIR)
 
 def clear_terminal():
     """
-    Clear the terminal screen (MacOS only)
+    Clear the terminal screen (Unix-based systems).
     """
     print("\033c", end="")
+
+def print_menu():
+    """
+    Print a menu to showcase all functions
+    """
+    while True:
+        clear_terminal()
+        print("=== F1 Date Tool ===")
+        print("1. View Race Results")
+        print("2. View Lap Times")
+        print("0. Exit")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            session = ask_for_session()
+            if session:
+                print_session_info(session)
+                print_standings(session)
+                input("\nPress Enter to return to menu...")
+
+        elif choice == "2":
+            session, driver= ask_for_session_and_driver()
+            if session and driver:
+                print_driver_lap_times(session, driver)
+                input("\nPress Enter to return to menu...")
+
+        elif choice == "0":
+            print("Goodbye!")
+            return
+        else:
+            print("Invalid choice.")
+
 
 def ask_for_session():
     """
@@ -43,7 +76,7 @@ def ask_for_session():
     valid_sessions = ['FP1', 'FP2', 'FP3', 'Q', 'SQ', 'SS', 'Sprint', 'Race']
     while True:
         session_type = input("Enter the session type (e.g., 'FP1', 'Q', 'Race'): ").strip()
-        session_type = session_type.capitalize() if session_type.lower == 'race' else session_type.upper()
+        session_type = session_type.capitalize() if session_type.lower() == 'race' else session_type.upper()
         if session_type.upper() not in [s.upper() for s in valid_sessions]:
             print(f"Invalid session type. Valid options: {', '.join(valid_sessions)}")
             continue
@@ -56,6 +89,28 @@ def ask_for_session():
     return session
 
 
+def ask_for_session_and_driver():
+    """
+    Prompt the user for year, race, session type, and driver, then load and return the FastF1  information.
+    """
+    session = ask_for_session()
+    if not session:
+        return None, None
+    
+    drivers = list(session.laps['Driver'].unique())
+    print("\nAvailable drivers in this session:")
+    for code in drivers:
+        info = session.get_driver(code)
+        print(f"{code}: {info['FullName']}")
+
+    while True:
+        driver_code = input("\nEnter the 3-letter driver code (e.g., NOR): ").strip().upper()
+        if driver_code in drivers:
+            return session, driver_code
+        else:
+            print("Invalid driver code. Please choose from the list.")
+
+
 def print_session_info(session):
     """
     Print basic info about the loaded session.
@@ -66,6 +121,7 @@ def print_session_info(session):
     print(f"Country: {session.event['Country']}")
     print(f"Date: {session.date}")
     print(f"Session Type: {session.name}")
+
 
 def print_standings(session):
     """
@@ -83,7 +139,7 @@ def print_standings(session):
         display_cols = ['Position', 'DriverName', team_col, 'Time']
         # Convert to string and split into lines 
         table_str = df[display_cols].to_string(
-            index = False,
+            index=False,
             formatters={
                 'Position' : lambda x: str(int(x))
             }
@@ -99,11 +155,13 @@ def print_standings(session):
     else:
         print("No standings available for this session.")
 
+
+def print_driver_lap_times(session, driver):
+    pass
+
+
 def main():
-    clear_terminal()
-    session = ask_for_session()
-    print_session_info(session)
-    print_standings(session)
+    print_menu()
 
 if __name__ == "__main__":
     main()
