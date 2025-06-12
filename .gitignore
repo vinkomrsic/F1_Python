@@ -1,0 +1,4 @@
+# Ignore all FastF1 cache files
+cache/
+# Ignore all .DS_Store files
+.DS_Store
