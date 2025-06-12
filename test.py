@@ -12,6 +12,12 @@ CACHE_DIR = 'cache'
 os.makedirs(CACHE_DIR, exist_ok=True)
 fastf1.Cache.enable_cache(CACHE_DIR)
 
+def clear_terminal():
+    """
+    Clear the terminal screen (MacOS only)
+    """
+    print("\033c", end="")
+
 def ask_for_session():
     """
     Prompt the user for year, race, and session type, then load and return the FastF1 session.
@@ -44,10 +50,32 @@ def print_standings(session):
     Print the official standings/results of the session.
     """
     standings = session.results 
-    print("\n=== Standings ===")
-    print(standings)
+    if standings is not None and not standings.empty:
+        df = standings.copy()
+        df['DriverName'] = [session.get_driver(code)['FullName'] for code in df.index]
+        # Handle team column name variations
+        team_col = 'TeamName' if 'TeamName' in df.columns else 'Team'
+        display_cols = ['Position', 'DriverName', team_col, 'Time']
+        # Convert to string and split into lines 
+        table_str = df[display_cols].to_string(
+            index = False,
+            formatters={
+                'Position' : lambda x: str(int(x))
+            }
+        )
+        lines = table_str.split('\n')
+        header = lines[0]
+        seperator = '-' * len(header)
+        print("\n=== Standings ===")
+        print(header)
+        print(seperator)
+        for line in lines[1:]:
+            print(line)
+    else:
+        print("No standings available for this session.")
 
 def main():
+    clear_terminal()
     session = ask_for_session()
     print_session_info(session)
     print_standings(session)
