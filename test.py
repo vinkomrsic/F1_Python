@@ -23,14 +23,36 @@ def ask_for_session():
     Prompt the user for year, race, and session type, then load and return the FastF1 session.
     """
     print("\n=== Formula 1 Results ===")
-    year = int(input("Enter the year of the session (e.g., 2025): "))
-    race = input("Enter the name of the race (e.g., 'Australia'): ")
-    session_type = input("Enter the session type (e.g., 'FP1', 'Q', 'Race'): ")
+    while True:
+        try:
+            year = int(input("Enter the year of the session (e.g., 2025): "))
+            if year < 1950:
+                print("The first F1 World Championship was in 1950. Please enter a valid year.")
+                continue
+            break
+        except ValueError:
+            print("Please enter a valid integer for the year.")
+        
+    while True:
+        race = input("Enter the name of the race (e.g., 'Australia'): ")
+        if not race:
+            print("Race name cannot be empty.")
+            continue
+        break
 
-    print("Loading session...")
+    valid_sessions = ['FP1', 'FP2', 'FP3', 'Q', 'SQ', 'SS', 'Sprint', 'Race']
+    while True:
+        session_type = input("Enter the session type (e.g., 'FP1', 'Q', 'Race'): ").strip()
+        session_type = session_type.capitalize() if session_type.lower == 'race' else session_type.upper()
+        if session_type.upper() not in [s.upper() for s in valid_sessions]:
+            print(f"Invalid session type. Valid options: {', '.join(valid_sessions)}")
+            continue
+        break
+
+    print("\nLoading session...")
     session = fastf1.get_session(year, race, session_type)
     session.load()
-    print("Session loaded seccessfully!")
+    print("Session loaded successfully!")
     return session
 
 
@@ -54,7 +76,10 @@ def print_standings(session):
         df = standings.copy()
         df['DriverName'] = [session.get_driver(code)['FullName'] for code in df.index]
         # Handle team column name variations
-        team_col = 'TeamName' if 'TeamName' in df.columns else 'Team'
+        team_col = next((col for col in ['TeamName', 'Team'] if col in df.columns), None)
+        if not team_col:
+            print("Could not find team information.")
+            return
         display_cols = ['Position', 'DriverName', team_col, 'Time']
         # Convert to string and split into lines 
         table_str = df[display_cols].to_string(
@@ -65,10 +90,10 @@ def print_standings(session):
         )
         lines = table_str.split('\n')
         header = lines[0]
-        seperator = '-' * len(header)
+        separator = '-' * len(header)
         print("\n=== Standings ===")
         print(header)
-        print(seperator)
+        print(separator)
         for line in lines[1:]:
             print(line)
     else:
