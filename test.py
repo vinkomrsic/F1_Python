@@ -273,16 +273,41 @@ def print_driver_lap_times_statistic(session, driver):
         print("\nNo lap data available for the selected driver.")
         return
     
-    xpoints = valid_laps['LapNumber'].to_numpy()
-    ypoints = valid_laps['LapTime'].dt.total_seconds().to_numpy()
+    # Extract lap data
+    lap_numbers = valid_laps['LapNumber'].to_numpy()
+    lap_times = valid_laps['LapTime'].dt.total_seconds().to_numpy()
+    pit_flags = valid_laps['PitInTime'].notna().to_numpy()
+
+    fastest_idx = lap_times.argmin()
+    fastest_lap_num = lap_numbers[fastest_idx]
+    fastest_lap_time = lap_times[fastest_idx]
+
+    # Seperate laps
+    lap_numbers_no_pit = lap_numbers[~pit_flags]
+    lap_times_no_pit = lap_times[~pit_flags]
+    lap_numbers_pit = lap_numbers[pit_flags]
+    lap_times_pit = lap_times[pit_flags]
 
     # Plotting
-    plt.style.use('_mpl-gallery')
-    plt.figure(figsize=(8, 4))
-    plt.plot(xpoints, ypoints, marker='o', linestyle='-')
+    plt.style.use('classic')
+    plt.figure(figsize=(10, 5))
+
+    # Normal laps
+    plt.plot(lap_numbers_no_pit, lap_times_no_pit, 'o-', label='Normal Lap', color='blue')
+
+    # Pit stop laps
+    plt.plot(lap_numbers_pit, lap_times_pit, 'o', linestyle='None', label='Pit Stop Lap', color='red')
+    for lap_num, lap_time in zip(lap_numbers_pit, lap_times_pit):
+        plt.fill_between([lap_num - 0.4, lap_num + 0.4], 0, lap_time, color='red', alpha=0.2)
+
+    # Fastest lap
+    plt.plot(fastest_lap_num, fastest_lap_time, 'o', color='green', label='Fastest Lap Time', markersize=10)
+    plt.fill_between([fastest_lap_num - 0.4, fastest_lap_num + 0.4], 0, fastest_lap_time,
+                     color='green', alpha=0.2)
+    
     plt.title(f"Lap Times for {driver}")
     plt.xlabel("Lap Number")
-    plt.ylabel("Lap Times")
+    plt.ylabel("Lap Times (sec)")
     plt.grid(True)
     plt.tight_layout()
     plt.show()
