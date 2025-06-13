@@ -278,6 +278,7 @@ def print_driver_lap_times_statistic(session, driver):
     lap_times = valid_laps['LapTime'].dt.total_seconds().to_numpy()
     pit_flags = valid_laps['PitInTime'].notna().to_numpy()
 
+    # Fastest lap
     fastest_idx = lap_times.argmin()
     fastest_lap_num = lap_numbers[fastest_idx]
     fastest_lap_time = lap_times[fastest_idx]
@@ -288,27 +289,30 @@ def print_driver_lap_times_statistic(session, driver):
     lap_numbers_pit = lap_numbers[pit_flags]
     lap_times_pit = lap_times[pit_flags]
 
-    # Plotting
+    # === Plotting ===
     plt.style.use('classic')
-    plt.figure(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(12, 6))
 
     # Normal laps
-    plt.plot(lap_numbers_no_pit, lap_times_no_pit, 'o-', label='Normal Lap', color='blue')
+    ax.plot(lap_numbers_no_pit, lap_times_no_pit, 'o-', label='Normal Lap', color='#007acc')
 
     # Pit stop laps
-    plt.plot(lap_numbers_pit, lap_times_pit, 'o', linestyle='None', label='Pit Stop Lap', color='red')
+    ax.plot(lap_numbers_pit, lap_times_pit, 'o', linestyle='None', label='Pit Stop Lap', color='#d62728')
     for lap_num, lap_time in zip(lap_numbers_pit, lap_times_pit):
-        plt.fill_between([lap_num - 0.4, lap_num + 0.4], 0, lap_time, color='red', alpha=0.2)
+        ax.fill_between([lap_num - 0.4, lap_num + 0.4], 0, lap_time, color='#d62728', alpha=0.1)
 
     # Fastest lap
-    plt.plot(fastest_lap_num, fastest_lap_time, 'o', color='green', label='Fastest Lap Time', markersize=10)
-    plt.fill_between([fastest_lap_num - 0.4, fastest_lap_num + 0.4], 0, fastest_lap_time,
-                     color='green', alpha=0.2)
+    ax.plot(fastest_lap_num, fastest_lap_time, 'o', color='#2ca02c', label='Fastest Lap Time', markersize=10)
+    ax.fill_between([fastest_lap_num - 0.4, fastest_lap_num + 0.4], 0, fastest_lap_time,
+                     color='#2ca02c', alpha=0.15)
     
-    plt.title(f"Lap Times for {driver}")
-    plt.xlabel("Lap Number")
-    plt.ylabel("Lap Times (sec)")
-    plt.grid(True)
+    ax.set_title(f"Lap Times for {driver}", fontsize=16, weight='bold')
+    ax.set_xlabel("Lap Number", fontsize=12)
+    ax.set_ylabel("Lap Times (seconds)", fontsize=12)
+    ax.grid(True, linestyle='-', linewidth=0.5, alpha=0.7)
+    ax.legend(loc='upper right', fontsize=10)
+    ax.set_facecolor('#f9f9f9')
+
     plt.tight_layout()
     plt.show()
 
