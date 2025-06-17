@@ -1,8 +1,10 @@
 import os
-import fastf1
 import logging
-import matplotlib.pyplot as plt
+
+import fastf1
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # Suppress FastF1 internal logs
 logging.getLogger('fastf1').setLevel(logging.CRITICAL)
@@ -14,11 +16,16 @@ CACHE_DIR = 'cache'
 os.makedirs(CACHE_DIR, exist_ok=True)
 fastf1.Cache.enable_cache(CACHE_DIR)
 
+
 def clear_terminal():
     """
     Clear the terminal screen (Unix-based systems).
     """
     print("\033c", end="")
+
+def pause():
+    input("\nPress Enter to return to menu...")
+    clear_terminal()
 
 def print_menu():
     """
@@ -37,15 +44,13 @@ def print_menu():
             if session:
                 print_session_info(session)
                 print_standings(session)
-            input("\nPress Enter to return to menu...")
-            clear_terminal()
+            pause()
 
         elif choice == "2":
             session, driver= ask_for_session_and_driver()
             if session and driver:
                 lap_time_menu(session, driver)
-            input("\nPress Enter to return to menu...")
-            clear_terminal()
+            pause()
 
         elif choice == "0":
             print("Goodbye!")
