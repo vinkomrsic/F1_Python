@@ -1,4 +1,6 @@
 # 🏎️ F1_Python — Formula 1 Data CLI Tool
+![Python](https://img.shields.io/badge/python-3.9+-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 A Python-based command-line interface (CLI) tool to explore Formula 1 race data using the [FastF1](https://github.com/theOehrly/Fast-F1) API.  
 Built for data nerds, racing fans, and anyone who wants to analyze F1 sessions without touching a browser.
