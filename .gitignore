@@ -2,3 +2,5 @@
 cache/
 # Ignore all .DS_Store files
 .DS_Store
+# Ignore all Pycache files
+__pycache__
