@@ -57,6 +57,13 @@ Built for data nerds, racing fans, and anyone who wants to analyze F1 sessions w
 
 ---
 
+## To Do
+
+- [ ] Add CSV export of lap data
+- [ ] Compare two drivers
+- [ ] Add command-line arguments (non-interactive mode)
+- [ ] Package as CLI tool (`f1tool`)
+
 ## Author
 
 Made by [@vinkomrsic](https://github.com/vinkomrsic)  
