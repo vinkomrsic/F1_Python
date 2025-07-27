@@ -4,3 +4,7 @@ cache/
 .DS_Store
 # Ignore all Pycache files
 __pycache__
+*.pyc
+# Ignore my personal test.py file
+test.py
+.venv/
